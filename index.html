@@ -1,0 +1,996 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080b12" />
+    <title>SkorKita - Sports Scoreboard</title>
+    <link rel="stylesheet" href="styles.css?v=29" />
+    <link rel="stylesheet" href="desktop.css?v=1" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="javascript:void(0)" aria-label="SkorKita">
+          <span class="brand-mark">S</span>
+          <span>SKOR<span>KITA</span></span>
+        </a>
+        <label class="sport-selector" for="sportSelect">
+          <span>Pilih Olahraga</span>
+          <select id="sportSelect" aria-label="Pilih olahraga">
+            <option value="football">Sepak Bola</option>
+            <option value="futsal">Futsal</option>
+            <option value="basketball">Basket</option>
+            <option value="badminton">Badminton</option>
+            <option value="volleyball">Bola Voli</option>
+          </select>
+        </label>
+        <a class="icon-button topbar-display-link" href="scoreboard.html" target="_blank" title="Buka scoreboard" aria-label="Buka scoreboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
+          </svg>
+        </a>
+      </header>
+
+      <section class="desktop-mode-bar" id="desktopModeBar" hidden>
+        <div class="desktop-mode-copy">
+          <span class="desktop-status-dot"></span>
+          <div>
+            <small>MODE APLIKASI</small>
+            <strong id="activeRoleLabel">Administrator</strong>
+          </div>
+        </div>
+        <nav class="desktop-role-switcher" aria-label="Pilih mode aplikasi">
+          <button type="button" data-app-role="administrator">Administrator</button>
+          <button type="button" data-app-role="field">Field Control</button>
+          <button type="button" data-app-role="single">Single Operator</button>
+        </nav>
+        <div class="desktop-network-summary">
+          <span>
+            <small>LOCAL NETWORK</small>
+            <strong id="desktopLocalAddress">Memulai server...</strong>
+          </span>
+          <span>
+            <small>DEVICE</small>
+            <strong id="desktopDeviceCount">0 tersambung</strong>
+          </span>
+          <button type="button" id="openViewerWindowButton">Buka Viewer</button>
+          <button type="button" id="openFullscreenViewerButton">Viewer Fullscreen</button>
+        </div>
+      </section>
+
+      <section class="desktop-device-panel" id="desktopDevicePanel" hidden>
+        <header>
+          <div>
+            <small>DEVICE MONITORING</small>
+            <strong>Perangkat di jaringan lokal</strong>
+          </div>
+          <button type="button" id="toggleDevicePanelButton">Tutup</button>
+        </header>
+        <div id="desktopDeviceList">
+          <p>Belum ada perangkat tersambung.</p>
+        </div>
+        <footer>
+          <span>Field Control</span>
+          <code id="fieldControlUrl">-</code>
+          <span>Viewer</span>
+          <code id="viewerUrl">-</code>
+        </footer>
+      </section>
+
+      <main>
+        <section class="controller-hero">
+          <div>
+            <span class="hero-badge"><i></i> LIVE CONTROL</span>
+            <h1>Control Panel</h1>
+            <p>Atur pertandingan dari sini. Tampilan penonton berjalan di jendela terpisah.</p>
+          </div>
+          <a class="open-scoreboard-button" id="openScoreboardButton" href="scoreboard.html" target="_blank">
+            Buka Scoreboard
+            <span>↗</span>
+          </a>
+        </section>
+
+        <section class="scoreboard controller-preview" id="scoreboard">
+          <div class="match-meta">
+            <span class="live-dot"></span>
+            <span id="matchStatus">PERTANDINGAN</span>
+            <span class="meta-divider"></span>
+            <span id="periodLabel">BABAK 1</span>
+          </div>
+
+          <div class="score-stage">
+            <article class="team-display home-team">
+              <div class="logo-frame" id="homeLogoFrame">
+                <img id="homeLogo" alt="Logo tim tuan rumah" hidden />
+                <span class="logo-placeholder">H</span>
+              </div>
+              <h2 id="homeNameDisplay">GARUDA FC</h2>
+              <p>TUAN RUMAH</p>
+            </article>
+
+            <div class="match-center">
+              <div class="timer" id="timerDisplay">45:00</div>
+              <div class="controller-added-time" id="controllerAddedTime" hidden>+00:00</div>
+              <div class="score-row">
+                <strong id="homeScoreDisplay">0</strong>
+                <span>:</span>
+                <strong id="awayScoreDisplay">0</strong>
+              </div>
+              <p class="hint" id="scoreHint">Tekan tombol untuk mengubah skor</p>
+            </div>
+
+            <article class="team-display away-team">
+              <div class="logo-frame" id="awayLogoFrame">
+                <img id="awayLogo" alt="Logo tim tamu" hidden />
+                <span class="logo-placeholder">A</span>
+              </div>
+              <h2 id="awayNameDisplay">RAJAWALI FC</h2>
+              <p>TIM TAMU</p>
+            </article>
+          </div>
+
+          <div class="set-strip" id="setStrip" hidden>
+            <span id="setStripLabel">SET</span>
+            <strong id="homeSetDisplay">0</strong>
+            <span class="set-divider">-</span>
+            <strong id="awaySetDisplay">0</strong>
+          </div>
+        </section>
+
+        <section class="control-panel">
+          <div class="controller-view active" data-controller-view="match">
+          <article class="match-setup-card">
+            <div class="event-card-heading">
+              <div class="event-icon setup-icon">M</div>
+              <div>
+                <span class="eyebrow">MATCH SETUP</span>
+                <h3>Informasi Pertandingan</h3>
+                <p>Data ini ikut tersimpan pada arsip dan tampil di scoreboard.</p>
+              </div>
+            </div>
+            <div class="match-setup-grid">
+              <label>
+                <span>Nama event</span>
+                <input id="eventNameInput" type="text" maxlength="60" placeholder="Contoh: Liga Komunitas 2026" />
+              </label>
+              <label>
+                <span>Format periode</span>
+                <select id="periodFormatSelect">
+                  <option value="half">Babak / Half</option>
+                  <option value="quarter">Kuarter</option>
+                  <option value="set">Set</option>
+                  <option value="game">Game</option>
+                </select>
+              </label>
+              <label id="matchDurationField">
+                <span>Durasi per periode</span>
+                <div class="setup-duration">
+                  <input id="matchDurationInput" type="number" min="0" max="180" value="45" />
+                  <small>menit</small>
+                </div>
+              </label>
+              <div class="setup-upload">
+                <span>Logo event · maks. 10 MB</span>
+                <label class="upload-button" for="eventLogoInput">Pilih logo</label>
+                <input id="eventLogoInput" type="file" accept="image/*" hidden />
+                <button id="removeEventLogoButton" type="button" hidden>Hapus</button>
+                <div class="media-library-control">
+                  <select data-media-library="event-logo" data-media-target="eventLogo" aria-label="Pustaka logo event">
+                    <option value="">Pustaka logo event</option>
+                  </select>
+                  <button type="button" data-use-media="eventLogo">Pakai</button>
+                  <button type="button" data-delete-media="eventLogo">Hapus file</button>
+                </div>
+              </div>
+              <fieldset class="football-phase-options" id="footballPhaseOptions">
+                <legend id="knockoutPhaseLegend">Fase knock-out sepak bola</legend>
+                <label>
+                  <input id="footballExtraTimeEnabled" type="checkbox" checked />
+                  <span id="knockoutExtraTimeLabel">Gunakan extra time 2 × 15 menit</span>
+                </label>
+                <label>
+                  <input id="footballPenaltiesEnabled" type="checkbox" />
+                  <span>Siapkan adu penalti</span>
+                </label>
+              </fieldset>
+              <div class="match-setup-apply">
+                <span id="matchSetupDraftStatus">LIVE</span>
+                <button id="applyMatchSetupButton" type="button" disabled>Apply nama & logo event</button>
+              </div>
+            </div>
+          </article>
+
+          <div class="control-heading">
+            <div>
+              <span class="eyebrow">PANEL OPERATOR</span>
+              <h2>Kontrol Pertandingan</h2>
+            </div>
+            <div class="heading-actions">
+              <button class="secondary-button" id="undoScoreButton" disabled>Undo skor</button>
+              <button class="secondary-button buzzer-button" id="buzzerButton">Buzzer</button>
+              <button class="secondary-button" id="finishMatchButton">Selesaikan</button>
+              <button class="secondary-button danger-outline" id="resetButton">Reset pertandingan</button>
+            </div>
+          </div>
+          <aside class="sport-rule-profile" id="sportRuleProfile">
+            <div>
+              <span class="eyebrow">PROFIL KONTROL</span>
+              <strong id="sportRuleTitle">Sepak Bola · IFAB</strong>
+            </div>
+            <p id="sportRuleSummary"></p>
+          </aside>
+
+          <div class="control-grid">
+            <article class="control-card team-control">
+              <span class="card-number">01</span>
+              <h3>Tim Tuan Rumah</h3>
+              <label class="field-label" for="homeName">Nama tim</label>
+              <input id="homeName" type="text" maxlength="22" value="GARUDA FC" />
+              <label class="team-color-control">
+                <span>Warna tim</span>
+                <input id="homeColorInput" type="color" value="#4d8dff" />
+              </label>
+              <div class="logo-input-row">
+                <label class="upload-button" for="homeLogoInput">Pilih logo</label>
+                <input id="homeLogoInput" type="file" accept="image/*" hidden />
+                <span id="homeFileName">PNG, JPG maks. 10 MB</span>
+              </div>
+              <div class="media-library-control compact">
+                <select data-media-library="team-logo" data-media-target="homeLogo" aria-label="Pustaka logo tuan rumah">
+                  <option value="">Pustaka logo tim</option>
+                </select>
+                <button type="button" data-use-media="homeLogo">Pakai</button>
+                <button type="button" data-delete-media="homeLogo">Hapus file</button>
+              </div>
+              <label class="logo-size-control">
+                <span>Ukuran logo <output id="homeLogoSizeValue">100%</output></span>
+                <input id="homeLogoSize" type="range" min="60" max="140" value="100" />
+              </label>
+              <div class="logo-fit-control" aria-label="Mode fit logo tuan rumah">
+                <button class="active" data-logo-fit-team="home" data-logo-fit="auto">Auto</button>
+                <button data-logo-fit-team="home" data-logo-fit="contain">Fit</button>
+                <button data-logo-fit-team="home" data-logo-fit="cover">Penuh</button>
+              </div>
+              <div class="score-controls">
+                <button class="score-button minus" data-team="home" data-amount="-1">−</button>
+                <output id="homeScoreControl">0</output>
+                <button class="score-button plus" data-team="home" data-amount="1">+</button>
+              </div>
+              <div class="quick-points" data-quick-points="home">
+                <button data-team="home" data-amount="1">+1</button>
+                <button data-team="home" data-amount="2">+2</button>
+                <button data-team="home" data-amount="3">+3</button>
+              </div>
+              <label class="manual-score-control">
+                <span>Input skor manual</span>
+                <input id="homeManualScore" type="number" min="0" max="999" value="0" />
+                <button data-apply-manual-score="home">Terapkan</button>
+              </label>
+              <div class="team-match-counters" id="homeMatchCounters">
+                <div id="homePrimaryCounter">
+                  <span id="homePrimaryCounterLabel">Timeout</span>
+                  <button data-counter="homeTimeouts" data-counter-amount="-1">−</button>
+                  <output id="homeTimeoutsControl">0</output>
+                  <button data-counter="homeTimeouts" data-counter-amount="1">+</button>
+                </div>
+                <div id="homeSecondaryCounter">
+                  <span id="homeSecondaryCounterLabel">Team foul</span>
+                  <button data-counter="homeTeamFouls" data-counter-amount="-1">−</button>
+                  <output id="homeTeamFoulsControl">0</output>
+                  <button data-counter="homeTeamFouls" data-counter-amount="1">+</button>
+                </div>
+              </div>
+              <button class="set-win-button set-sport-only" data-set-team="home" hidden>
+                + Menang set
+              </button>
+            </article>
+
+            <article class="control-card time-control">
+              <span class="card-number">02</span>
+              <h3 id="timeControlTitle">Waktu & Babak</h3>
+              <div class="timer-mode-control" id="timerModeControl">
+                <span>MODE HITUNG</span>
+                <div>
+                  <button class="active" data-timer-mode="up">Hitung Maju</button>
+                  <button data-timer-mode="down">Hitung Mundur</button>
+                </div>
+              </div>
+              <div class="time-inputs" id="matchClockInputs">
+                <label>
+                  <span>Menit</span>
+                  <input id="minuteInput" type="number" min="0" max="99" value="45" />
+                </label>
+                <span>:</span>
+                <label>
+                  <span>Detik</span>
+                  <input id="secondInput" type="number" min="0" max="59" value="0" />
+                </label>
+              </div>
+              <div class="transport-controls" id="transportControls">
+                <button class="transport-button start" id="startTimerButton">
+                  <span>▶</span> Start
+                </button>
+                <button class="transport-button" id="pauseTimerButton">
+                  <span>Ⅱ</span> Pause
+                </button>
+                <button class="transport-button" id="stopTimerButton">
+                  <span>■</span> Stop
+                </button>
+                <button class="transport-button restart" id="restartTimerButton">
+                  <span>↻</span> Restart
+                </button>
+              </div>
+              <div class="period-controls">
+                <button id="previousPeriod">−</button>
+                <div>
+                  <span id="periodControlTitle">BABAK</span>
+                  <strong id="periodControlValue">1</strong>
+                </div>
+                <button id="nextPeriod">+</button>
+              </div>
+              <button class="text-button" id="resetTimerButton">Atur ulang waktu</button>
+              <div class="normal-added-time-setup" id="normalAddedTimeSetup" hidden>
+                <label>
+                  <span>Tambahan Babak 1</span>
+                  <input id="firstHalfAddedTimeInput" type="number" min="0" max="30" value="0" />
+                  <small>menit</small>
+                </label>
+                <label>
+                  <span>Tambahan Babak 2</span>
+                  <input id="secondHalfAddedTimeInput" type="number" min="0" max="30" value="0" />
+                  <small>menit</small>
+                </label>
+              </div>
+              <div class="normal-added-time-control" id="normalAddedTimeControl" hidden>
+                <div>
+                  <span>WAKTU TAMBAHAN NORMAL</span>
+                  <strong id="normalAddedTimeValue">+00:00</strong>
+                </div>
+                <button id="normalAddedTimeButton">Mulai tambahan Babak 1</button>
+              </div>
+              <div class="extra-time-control" id="extraTimeControl">
+                <div>
+                  <span>FASE TAMBAHAN</span>
+                  <strong id="extraTimeLabel">Extra Time</strong>
+                </div>
+                <div class="extra-time-setup">
+                  <label>
+                    <span>Durasi menit</span>
+                    <input id="extraTimeMinuteInput" type="number" min="1" max="99" value="5" />
+                  </label>
+                  <button id="extraTimeButton">Aktifkan</button>
+                </div>
+              </div>
+              <div class="penalty-control" id="penaltyControl" hidden>
+                <div>
+                  <span>ADU PENALTI</span>
+                  <button id="penaltyShootoutButton">Mulai adu penalti</button>
+                </div>
+                <div class="penalty-score-controls">
+                  <label>
+                    <span id="homePenaltyLabel">Tuan Rumah</span>
+                    <button data-penalty-team="home" data-penalty-amount="-1">−</button>
+                    <output id="homePenaltyScoreControl">0</output>
+                    <button data-penalty-team="home" data-penalty-amount="1">+</button>
+                  </label>
+                  <label>
+                    <span id="awayPenaltyLabel">Tim Tamu</span>
+                    <button data-penalty-team="away" data-penalty-amount="-1">−</button>
+                    <output id="awayPenaltyScoreControl">0</output>
+                    <button data-penalty-team="away" data-penalty-amount="1">+</button>
+                  </label>
+                </div>
+              </div>
+              <div class="rally-rule-status" id="rallyRuleStatus" hidden>
+                <span>RALLY POINT</span>
+                <strong id="rallyRuleText">21 poin · selisih 2</strong>
+              </div>
+            </article>
+
+            <article class="control-card team-control">
+              <span class="card-number">03</span>
+              <h3>Tim Tamu</h3>
+              <label class="field-label" for="awayName">Nama tim</label>
+              <input id="awayName" type="text" maxlength="22" value="RAJAWALI FC" />
+              <label class="team-color-control">
+                <span>Warna tim</span>
+                <input id="awayColorInput" type="color" value="#ff4d5f" />
+              </label>
+              <div class="logo-input-row">
+                <label class="upload-button" for="awayLogoInput">Pilih logo</label>
+                <input id="awayLogoInput" type="file" accept="image/*" hidden />
+                <span id="awayFileName">PNG, JPG maks. 10 MB</span>
+              </div>
+              <div class="media-library-control compact">
+                <select data-media-library="team-logo" data-media-target="awayLogo" aria-label="Pustaka logo tim tamu">
+                  <option value="">Pustaka logo tim</option>
+                </select>
+                <button type="button" data-use-media="awayLogo">Pakai</button>
+                <button type="button" data-delete-media="awayLogo">Hapus file</button>
+              </div>
+              <label class="logo-size-control">
+                <span>Ukuran logo <output id="awayLogoSizeValue">100%</output></span>
+                <input id="awayLogoSize" type="range" min="60" max="140" value="100" />
+              </label>
+              <div class="logo-fit-control" aria-label="Mode fit logo tim tamu">
+                <button class="active" data-logo-fit-team="away" data-logo-fit="auto">Auto</button>
+                <button data-logo-fit-team="away" data-logo-fit="contain">Fit</button>
+                <button data-logo-fit-team="away" data-logo-fit="cover">Penuh</button>
+              </div>
+              <div class="score-controls">
+                <button class="score-button minus" data-team="away" data-amount="-1">−</button>
+                <output id="awayScoreControl">0</output>
+                <button class="score-button plus" data-team="away" data-amount="1">+</button>
+              </div>
+              <div class="quick-points" data-quick-points="away">
+                <button data-team="away" data-amount="1">+1</button>
+                <button data-team="away" data-amount="2">+2</button>
+                <button data-team="away" data-amount="3">+3</button>
+              </div>
+              <label class="manual-score-control">
+                <span>Input skor manual</span>
+                <input id="awayManualScore" type="number" min="0" max="999" value="0" />
+                <button data-apply-manual-score="away">Terapkan</button>
+              </label>
+              <div class="team-match-counters" id="awayMatchCounters">
+                <div id="awayPrimaryCounter">
+                  <span id="awayPrimaryCounterLabel">Timeout</span>
+                  <button data-counter="awayTimeouts" data-counter-amount="-1">−</button>
+                  <output id="awayTimeoutsControl">0</output>
+                  <button data-counter="awayTimeouts" data-counter-amount="1">+</button>
+                </div>
+                <div id="awaySecondaryCounter">
+                  <span id="awaySecondaryCounterLabel">Team foul</span>
+                  <button data-counter="awayTeamFouls" data-counter-amount="-1">−</button>
+                  <output id="awayTeamFoulsControl">0</output>
+                  <button data-counter="awayTeamFouls" data-counter-amount="1">+</button>
+                </div>
+              </div>
+              <button class="set-win-button set-sport-only" data-set-team="away" hidden>
+                + Menang set
+              </button>
+            </article>
+          </div>
+
+          <div class="event-control-grid">
+            <article class="substitution-card" id="substitutionCard">
+              <div class="event-card-heading">
+                <div class="event-icon substitution-icon">⇄</div>
+                <div>
+                  <span class="eyebrow">MATCH EVENT</span>
+                  <h3>Pergantian Pemain</h3>
+                  <p id="substitutionRuleText">Maksimal 5 pergantian dalam satu tampilan.</p>
+                </div>
+              </div>
+              <div class="team-choice" aria-label="Pilih tim pergantian">
+                <button class="active" data-sub-team="home" id="subHomeButton">Tuan Rumah</button>
+                <button data-sub-team="away" id="subAwayButton">Tim Tamu</button>
+              </div>
+              <div class="substitution-list" id="substitutionList">
+                <div class="substitution-entry" data-sub-entry="0">
+                  <span class="entry-number">1</span>
+                  <label><span class="player-direction out">↓</span><span>Keluar</span><input data-player-out type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <label><span class="player-direction in">↑</span><span>Masuk</span><input data-player-in type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <button class="delete-substitution" data-remove-sub="0" title="Hapus baris">×</button>
+                </div>
+                <div class="substitution-entry" data-sub-entry="1" hidden>
+                  <span class="entry-number">2</span>
+                  <label><span class="player-direction out">↓</span><span>Keluar</span><input data-player-out type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <label><span class="player-direction in">↑</span><span>Masuk</span><input data-player-in type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <button class="delete-substitution" data-remove-sub="1" title="Hapus baris">×</button>
+                </div>
+                <div class="substitution-entry" data-sub-entry="2" hidden>
+                  <span class="entry-number">3</span>
+                  <label><span class="player-direction out">↓</span><span>Keluar</span><input data-player-out type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <label><span class="player-direction in">↑</span><span>Masuk</span><input data-player-in type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <button class="delete-substitution" data-remove-sub="2" title="Hapus baris">×</button>
+                </div>
+                <div class="substitution-entry" data-sub-entry="3" hidden>
+                  <span class="entry-number">4</span>
+                  <label><span class="player-direction out">↓</span><span>Keluar</span><input data-player-out type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <label><span class="player-direction in">↑</span><span>Masuk</span><input data-player-in type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <button class="delete-substitution" data-remove-sub="3" title="Hapus baris">×</button>
+                </div>
+                <div class="substitution-entry" data-sub-entry="4" hidden>
+                  <span class="entry-number">5</span>
+                  <label><span class="player-direction out">↓</span><span>Keluar</span><input data-player-out type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <label><span class="player-direction in">↑</span><span>Masuk</span><input data-player-in type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <button class="delete-substitution" data-remove-sub="4" title="Hapus baris">×</button>
+                </div>
+                <div class="substitution-entry" data-sub-entry="5" hidden>
+                  <span class="entry-number">6</span>
+                  <label><span class="player-direction out">↓</span><span>Keluar</span><input data-player-out type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <label><span class="player-direction in">↑</span><span>Masuk</span><input data-player-in type="text" maxlength="24" placeholder="Nama / nomor" /></label>
+                  <button class="delete-substitution" data-remove-sub="5" title="Hapus baris">×</button>
+                </div>
+              </div>
+              <button class="add-substitution-button" id="addSubstitutionButton">＋ Add pemain</button>
+              <div class="event-action-row">
+                <button class="show-event-button" id="showSubstitutionButton">Tampilkan 6 detik</button>
+                <button class="close-event-button" id="clearSubstitutionButton" disabled>Tutup</button>
+              </div>
+            </article>
+
+            <article class="review-card">
+              <div class="event-card-heading">
+                <div class="event-icon review-icon">R</div>
+                <div>
+                  <span class="eyebrow">OFFICIAL REVIEW</span>
+                  <h3 id="reviewControlTitle">VAR</h3>
+                  <p id="reviewControlDescription">Tampilkan status pemeriksaan keputusan di layar utama.</p>
+                </div>
+              </div>
+              <div class="review-action-layout">
+                <div class="review-action-side">
+                  <span class="action-group-label">STATUS REVIEW</span>
+                  <div class="review-team-choice">
+                    <button class="active" data-review-team="home">Tuan Rumah</button>
+                    <button data-review-team="away">Tim Tamu</button>
+                  </div>
+                  <button class="review-button checking" id="startReviewButton">
+                    <span></span>
+                    Mulai Pemeriksaan
+                  </button>
+                  <button class="review-clear" id="clearReviewButton" disabled>Tutup Status</button>
+                </div>
+                <div class="review-action-side result-side">
+                  <span class="action-group-label">HASIL KEPUTUSAN</span>
+                  <div>
+                    <button class="review-button accepted" id="acceptReviewButton" disabled>
+                      Diterima
+                    </button>
+                    <button class="review-button rejected" id="rejectReviewButton" disabled>
+                      Ditolak
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <article class="foul-card">
+            <div class="event-card-heading">
+              <div class="event-icon foul-icon">!</div>
+              <div>
+                <span class="eyebrow">FOUL & MATCH EVENT</span>
+                <h3 id="foulControlTitle">Pelanggaran / Kejadian</h3>
+                <p id="foulRuleText">Pilih tim dan kejadian sesuai cabang olahraga.</p>
+              </div>
+            </div>
+            <div class="foul-control-layout">
+              <div class="team-choice foul-team-choice" aria-label="Pilih tim pelanggaran">
+                <button class="active" data-foul-team="home">Tuan Rumah</button>
+                <button data-foul-team="away">Tim Tamu</button>
+              </div>
+              <div class="foul-event-options" id="foulEventOptions"></div>
+              <button class="close-event-button foul-close-button" id="clearFoulButton" disabled>
+                Tutup Tampilan
+              </button>
+            </div>
+          </article>
+
+          <article class="history-card">
+            <div class="event-card-heading">
+              <div class="event-icon history-icon">H</div>
+              <div>
+                <span class="eyebrow">MATCH DATA</span>
+                <h3>Riwayat & Ekspor</h3>
+                <p>Simpan snapshot pertandingan atau ekspor hasil dan riwayat skor.</p>
+              </div>
+            </div>
+            <div class="history-actions">
+              <button id="saveMatchButton">Simpan pertandingan</button>
+              <button id="exportPdfButton">Ekspor hasil PDF</button>
+              <button id="exportCsvButton">Ekspor riwayat CSV</button>
+            </div>
+            <div class="saved-match-list" id="savedMatchList"></div>
+          </article>
+          </div>
+
+          <div class="controller-view" data-controller-view="ticker">
+          <article class="ticker-card">
+            <div class="event-card-heading">
+              <div class="event-icon ticker-icon">T</div>
+              <div>
+                <span class="eyebrow">AUDIENCE MESSAGE</span>
+                <h3>Running Text</h3>
+                <p>Kirim pengumuman, sponsor, atau informasi untuk penonton di lapangan.</p>
+              </div>
+            </div>
+            <div class="ticker-control-row">
+              <input
+                id="runningTextInput"
+                type="text"
+                maxlength="180"
+                placeholder="Ketik pesan lalu tambahkan ke antrean"
+              />
+              <button class="ticker-show-button" id="showRunningTextButton">Tambah Pesan</button>
+              <button class="ticker-play-button" id="toggleRunningTextButton" disabled>▶ Play</button>
+              <button class="ticker-clear-button" id="clearRunningTextButton" disabled>Hapus Semua</button>
+            </div>
+            <div class="ticker-queue" id="runningTextQueue">
+              <p>Belum ada pesan dalam antrean.</p>
+            </div>
+          </article>
+
+          <article class="branding-card sponsor-controller-card">
+            <div class="event-card-heading">
+              <div class="event-icon branding-icon">S</div>
+              <div>
+                <span class="eyebrow">SPONSOR DISPLAY</span>
+                <h3>Konten Sponsor</h3>
+                <p>Nama dan logo bersifat opsional. Isi salah satu atau keduanya, cek preview, lalu tekan Play.</p>
+              </div>
+            </div>
+            <div class="sponsor-workspace">
+              <div>
+                <div class="branding-controls sponsor-branding-controls">
+                  <label>
+                    <span>Nama sponsor (opsional)</span>
+                    <input id="sponsorNameInput" type="text" maxlength="50" placeholder="Nama sponsor" />
+                  </label>
+                  <div class="setup-upload">
+                    <span>Logo sponsor (opsional) · maks. 10 MB</span>
+                    <label class="upload-button" for="sponsorLogoInput">Pilih logo</label>
+                    <input id="sponsorLogoInput" type="file" accept="image/*" hidden />
+                    <button id="removeSponsorLogoButton" type="button" hidden>Hapus</button>
+                    <div class="media-library-control">
+                      <select data-media-library="sponsor-logo" data-media-target="sponsorLogo" aria-label="Pustaka logo sponsor">
+                        <option value="">Pustaka sponsor</option>
+                      </select>
+                      <button type="button" data-use-media="sponsorLogo">Pakai</button>
+                      <button type="button" data-delete-media="sponsorLogo">Hapus file</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="sponsor-template-options">
+                  <button class="active" data-sponsor-template="sport">Sport Motion</button>
+                  <button data-sponsor-template="spotlight">Logo Spotlight</button>
+                  <button data-sponsor-template="energy">Energy Sweep</button>
+                </div>
+                <div class="sponsor-tuning-controls">
+                  <label>
+                    <span>Teks "presented by"</span>
+                    <input id="sponsorPresentedByInput" type="text" maxlength="40" placeholder="PRESENTED BY" />
+                  </label>
+                  <label class="overlay-control">
+                    <span>Ukuran nama sponsor <output id="sponsorNameSizeValue">100%</output></span>
+                    <input id="sponsorNameSizeInput" type="range" min="50" max="220" value="100" />
+                  </label>
+                  <label class="overlay-control">
+                    <span>Ukuran logo sponsor <output id="sponsorLogoSizeValue">100%</output></span>
+                    <input id="sponsorLogoSizeInput" type="range" min="50" max="250" value="100" />
+                  </label>
+                </div>
+              </div>
+              <div class="sponsor-preview-panel">
+                <div class="sponsor-preview-heading">
+                  <span>PREVIEW SPONSOR</span>
+                  <small>Maksimal 4 detik</small>
+                </div>
+                <div class="sponsor-preview-screen" id="sponsorPreviewScreen" data-template="sport" data-sport="football">
+                  <span id="sponsorPreviewKicker">PRESENTED BY</span>
+                  <img id="sponsorPreviewLogo" alt="Preview logo sponsor" hidden />
+                  <strong id="sponsorPreviewName" hidden></strong>
+                  <em id="sponsorPreviewEmpty">Pilih logo atau isi nama sponsor</em>
+                </div>
+                <button class="sponsor-mode-button sponsor-play-button" id="sponsorModeButton">
+                  <span aria-hidden="true">▶</span>
+                  Play Sponsor
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article class="branding-card camera-controller-card" hidden>
+            <div class="event-card-heading">
+              <div class="event-icon camera-icon">C</div>
+              <div>
+                <span class="eyebrow">BREAK ENTERTAINMENT</span>
+                <h3>Camera Pop-up</h3>
+                <p>Tampilkan kamera laptop, webcam, capture card, screen share, atau output NDI Bridge saat jeda acara.</p>
+              </div>
+            </div>
+            <div class="camera-workspace">
+              <div class="camera-controls">
+                <label>
+                  <span>Sumber input</span>
+                  <select id="cameraSourceType">
+                    <option value="camera">Kamera / Capture Card</option>
+                    <option value="screen">Screen Share</option>
+                    <option value="stream">NDI Bridge / Stream URL</option>
+                  </select>
+                </label>
+                <label id="cameraDeviceField">
+                  <span>Pilih kamera</span>
+                  <select id="cameraDeviceSelect">
+                    <option value="">Kamera default</option>
+                  </select>
+                </label>
+                <label id="cameraStreamField" hidden>
+                  <span>URL HLS/MP4/WebM dari NDI Bridge</span>
+                  <input id="cameraStreamUrl" type="url" placeholder="https://..." />
+                </label>
+                <label>
+                  <span>Filter kamera</span>
+                  <select id="cameraFilterSelect">
+                    <option value="none">Normal</option>
+                    <option value="vivid">Vivid</option>
+                    <option value="cool">Cool</option>
+                    <option value="mono">Monochrome</option>
+                    <option value="sepia">Retro Sepia</option>
+                  </select>
+                </label>
+                <div class="camera-emoji-control">
+                  <span>Emoticon overlay</span>
+                  <div>
+                    <button class="active" data-camera-emoji="">Tanpa emoji</button>
+                    <button data-camera-emoji="🎉">🎉</button>
+                    <button data-camera-emoji="😎">😎</button>
+                    <button data-camera-emoji="🔥">🔥</button>
+                    <button data-camera-emoji="❤️">❤️</button>
+                  </div>
+                </div>
+                <div class="camera-source-actions">
+                  <button id="startCameraPreviewButton">Aktifkan Preview</button>
+                  <button id="stopCameraPreviewButton" disabled>Stop Preview</button>
+                </div>
+                <small class="camera-ndi-note">
+                  NDI native tidak dapat dibuka langsung oleh browser. Gunakan NDI Bridge/gateway yang menghasilkan HLS, MP4, atau WebM kompatibel browser.
+                  Untuk kamera antar-tab yang stabil, buka scoreboard lewat tombol controller dan jalankan aplikasi melalui localhost.
+                </small>
+              </div>
+              <div class="camera-preview-panel">
+                <div class="sponsor-preview-heading">
+                  <span>CAMERA PREVIEW</span>
+                  <small id="cameraPreviewStatus">OFFLINE</small>
+                </div>
+                <div class="camera-preview-screen" data-filter="none">
+                  <video id="cameraPreviewVideo" muted autoplay playsinline></video>
+                  <span class="camera-preview-emoji" id="cameraPreviewEmoji"></span>
+                  <p id="cameraPreviewPlaceholder">Aktifkan sumber video untuk melihat preview</p>
+                </div>
+                <div class="camera-live-actions">
+                  <button class="camera-play-button" id="playCameraButton" disabled>▶ Play ke Scoreboard</button>
+                  <button class="camera-close-button" id="closeCameraButton" disabled>Close & Kembali ke Skor</button>
+                </div>
+              </div>
+            </div>
+          </article>
+          </div>
+
+          <div class="controller-view" data-controller-view="visual">
+          <article class="appearance-card">
+            <div class="appearance-copy">
+              <span class="card-number">04</span>
+              <span class="eyebrow">VISUAL PERTANDINGAN</span>
+              <h3>Visual & Layout Scoreboard</h3>
+              <p>Siapkan tampilan di layar preview. Perubahan baru tampil ke penonton setelah Go Live.</p>
+            </div>
+              <div class="appearance-controls">
+              <label class="high-contrast-toggle visual-high-contrast-toggle">
+                <input id="highContrastInput" type="checkbox" />
+                <span>High contrast</span>
+              </label>
+              <span class="background-section-label style-section-label">STYLE SCOREBOARD</span>
+              <div class="scoreboard-style-options template-options">
+                <button class="scoreboard-style-button active" data-display-template="modern">
+                  <span class="style-preview modern-preview">
+                    <i>2</i><b>:</b><i>1</i>
+                  </span>
+                  <span><strong>Modern Clean</strong><small>Bersih & dinamis</small></span>
+                </button>
+                <button class="scoreboard-style-button" data-display-template="broadcast">
+                  <span class="style-preview broadcast-preview">
+                    <i>2</i><b>:</b><i>1</i>
+                  </span>
+                  <span><strong>Broadcast Sport</strong><small>Grafis siaran</small></span>
+                </button>
+                <button class="scoreboard-style-button" data-display-template="led">
+                  <span class="style-preview led-preview">
+                    <i>2</i><b>:</b><i>1</i>
+                  </span>
+                  <span><strong>High Contrast LED</strong><small>Videotron terang</small></span>
+                </button>
+                <button class="scoreboard-style-button" data-display-template="retro">
+                  <span class="style-preview retro-preview">
+                    <i>2</i><b>:</b><i>1</i>
+                  </span>
+                  <span><strong>Retro Pixel</strong><small>LED dot klasik</small></span>
+                </button>
+              </div>
+              <span class="background-section-label">RASIO OUTPUT</span>
+              <div class="output-ratio-controls">
+                <select id="displayRatioSelect">
+                  <option value="16:9">16:9 Videotron</option>
+                  <option value="4:3">4:3 Standard</option>
+                  <option value="custom">Custom LED</option>
+                </select>
+                <input id="customRatioWidthInput" type="number" min="1" max="9999" value="16" aria-label="Lebar rasio custom" hidden />
+                <span id="customRatioDivider" hidden>:</span>
+                <input id="customRatioHeightInput" type="number" min="1" max="9999" value="9" aria-label="Tinggi rasio custom" hidden />
+              </div>
+              <span class="background-section-label">PALET WARNA</span>
+              <div class="color-palette-options" id="modernPaletteOptions">
+                <button class="active" data-modern-palette="white"><i style="--swatch:#ffffff"></i>Putih</button>
+                <button data-modern-palette="blue"><i style="--swatch:#4d8dff"></i>Biru</button>
+                <button data-modern-palette="red"><i style="--swatch:#ff4d5f"></i>Merah</button>
+                <button data-modern-palette="green"><i style="--swatch:#42dc82"></i>Hijau</button>
+                <button data-modern-palette="orange"><i style="--swatch:#ff9f43"></i>Oranye</button>
+                <button data-modern-palette="purple"><i style="--swatch:#a56cff"></i>Ungu</button>
+              </div>
+              <div class="color-palette-options neon-palette-options" id="retroPaletteOptions" hidden>
+                <button class="active" data-retro-palette="cyan"><i style="--swatch:#20f7ff"></i>Cyan Neon</button>
+                <button data-retro-palette="magenta"><i style="--swatch:#ff36d8"></i>Magenta</button>
+                <button data-retro-palette="lime"><i style="--swatch:#a6ff2e"></i>Lime Neon</button>
+                <button data-retro-palette="amber"><i style="--swatch:#ffd23f"></i>Amber</button>
+              </div>
+              <span class="background-section-label">LAYOUT SCOREBOARD</span>
+              <div class="layout-preset-options">
+                <button class="active" data-layout-preset="classic">
+                  <i class="layout-icon layout-classic"><b></b><b></b><b></b></i>
+                  <span>Klasik</span>
+                </button>
+                <button data-layout-preset="compact">
+                  <i class="layout-icon layout-compact"><b></b><b></b><b></b></i>
+                  <span>Compact</span>
+                </button>
+                <button data-layout-preset="score-focus">
+                  <i class="layout-icon layout-score-focus"><b></b><b></b><b></b></i>
+                  <span>Fokus Skor</span>
+                </button>
+                <button data-layout-preset="stacked">
+                  <i class="layout-icon layout-stacked"><b></b><b></b><b></b></i>
+                  <span>Logo Atas</span>
+                </button>
+              </div>
+              <div class="layout-tuning-controls">
+                <label class="overlay-control">
+                  <span>Ukuran layout <output id="layoutScaleValue">100%</output></span>
+                  <input id="layoutScaleInput" type="range" min="75" max="125" value="100" />
+                </label>
+                <label class="overlay-control">
+                  <span>Jarak elemen <output id="layoutGapValue">100%</output></span>
+                  <input id="layoutGapInput" type="range" min="50" max="150" value="100" />
+                </label>
+                <label class="overlay-control">
+                  <span>Posisi vertikal <output id="layoutVerticalValue">Tengah</output></span>
+                  <input id="layoutVerticalInput" type="range" min="-100" max="100" value="0" />
+                </label>
+                <label class="overlay-control">
+                  <span>Ukuran nama event <output id="eventNameSizeValue">100%</output></span>
+                  <input id="eventNameSizeInput" type="range" min="50" max="200" value="100" />
+                </label>
+                <label class="overlay-control">
+                  <span>Ukuran logo event <output id="eventLogoSizeValue">100%</output></span>
+                  <input id="eventLogoSizeInput" type="range" min="50" max="250" value="100" />
+                </label>
+              </div>
+              <div class="background-presets" aria-label="Pilihan background">
+                <button class="background-preset active" data-background="midnight">
+                  <span class="preset-preview preset-midnight"></span>
+                  <span>Midnight</span>
+                </button>
+                <button class="background-preset" data-background="stadium">
+                  <span class="preset-preview preset-stadium"></span>
+                  <span>Stadium</span>
+                </button>
+                <button class="background-preset" data-background="electric">
+                  <span class="preset-preview preset-electric"></span>
+                  <span>Electric</span>
+                </button>
+                <button class="background-preset" data-background="ember">
+                  <span class="preset-preview preset-ember"></span>
+                  <span>Ember</span>
+                </button>
+              </div>
+              <span class="background-section-label">TEMPLATE CABANG OLAHRAGA</span>
+              <div class="sport-background-presets">
+                <button data-background="sport-football">Sepak Bola</button>
+                <button data-background="sport-futsal">Futsal</button>
+                <button data-background="sport-basketball">Basket</button>
+                <button data-background="sport-badminton">Badminton</button>
+                <button data-background="sport-volleyball">Bola Voli</button>
+              </div>
+              <div class="custom-background-row">
+                <div>
+                  <label class="upload-button background-upload" for="backgroundInput">
+                    <span>＋</span> Upload foto / video
+                  </label>
+                  <input id="backgroundInput" type="file" accept="image/*,video/mp4,video/webm" hidden />
+                  <span class="background-file-name" id="backgroundFileName">Foto/video maks. 10 MB · video maks. 5 detik</span>
+                </div>
+                <button class="remove-background" id="removeBackground" hidden>Hapus gambar</button>
+                <div class="media-library-control background-library">
+                  <select data-media-library="background" data-media-target="background" aria-label="Pustaka background">
+                    <option value="">Pustaka background</option>
+                  </select>
+                  <button type="button" data-use-media="background">Pakai</button>
+                  <button type="button" data-delete-media="background">Hapus file</button>
+                </div>
+                <label class="overlay-control">
+                  <span>Tingkat gelap <output id="overlayValue">55%</output></span>
+                  <input id="overlayInput" type="range" min="0" max="100" value="55" />
+                </label>
+                <label class="overlay-control media-scale-control">
+                  <span>Ukuran media <output id="backgroundScaleValue">100%</output></span>
+                  <input id="backgroundScaleInput" type="range" min="70" max="160" value="100" />
+                </label>
+                <div class="video-playback-control" id="videoPlaybackControl" hidden>
+                  <span>VIDEO BACKGROUND</span>
+                  <div>
+                    <button id="toggleVideoPlayback">Stop</button>
+                    <button id="toggleVideoLoop">Loop: ON</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="visual-preview-panel">
+              <div class="visual-preview-heading">
+                <span>LAYAR PREVIEW</span>
+                <b id="visualDraftStatus">LIVE</b>
+              </div>
+              <div class="visual-preview-screen">
+                <iframe
+                  id="visualPreviewFrame"
+                  src="scoreboard.html?preview=1"
+                  title="Preview visual scoreboard"
+                ></iframe>
+              </div>
+              <div class="visual-publish-row">
+                <small>Perubahan visual belum mengubah layar penonton sebelum dipublikasikan.</small>
+                <button class="visual-go-live-button" id="visualGoLiveButton" disabled>
+                  <span></span>
+                  Go Live
+                </button>
+              </div>
+            </div>
+          </article>
+          </div>
+        </section>
+      </main>
+      <footer class="controller-footer">
+        <nav aria-label="Pilih menu controller">
+          <button type="button" class="active" data-controller-target="match">
+            <b>PERTANDINGAN</b>
+            <span>Skor · Event · Review · Foul</span>
+          </button>
+          <button type="button" data-controller-target="ticker">
+            <b>PESAN & SPONSOR</b>
+            <span>Running text · Sponsor</span>
+          </button>
+          <button type="button" data-controller-target="visual">
+            <b>VISUAL</b>
+            <span>Layout · Preview · Go Live</span>
+          </button>
+        </nav>
+      </footer>
+      <dialog class="confirm-dialog" id="resetConfirmDialog">
+        <form method="dialog">
+          <span class="eyebrow">KONFIRMASI</span>
+          <h3>Reset pertandingan?</h3>
+          <p>Skor, waktu, foul, timeout, dan riwayat aksi pertandingan akan dikosongkan.</p>
+          <div>
+            <button value="cancel">Batal</button>
+            <button class="danger-confirm" value="confirm">Reset Sekarang</button>
+          </div>
+        </form>
+      </dialog>
+      <dialog class="confirm-dialog" id="deleteArchiveDialog">
+        <form method="dialog">
+          <span class="eyebrow">KONFIRMASI</span>
+          <h3>Hapus rekaman pertandingan?</h3>
+          <p id="deleteArchiveText">Data hasil, log gol, foul, dan logo pada arsip ini akan dihapus permanen.</p>
+          <div>
+            <button value="cancel">Batal</button>
+            <button class="danger-confirm" value="confirm">Hapus Permanen</button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+    <div class="app-credit" aria-hidden="true">developed by akarya</div>
+    <script src="app.js?v=38"></script>
+    <script src="desktop-runtime.js?v=1"></script>
+  </body>
+</html>

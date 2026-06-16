@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SkorKita v1",
+  "version": "1.0.0",
+  "identifier": "id.skorkita.scoreboard",
+  "build": {
+    "beforeDevCommand": "python3 scripts/build_frontend.py",
+    "beforeBuildCommand": "python3 scripts/build_frontend.py",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "SkorKita v1 - Administrator",
+        "url": "index.html?role=administrator&desktop=1",
+        "width": 1440,
+        "height": 940,
+        "minWidth": 1024,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' ipc: http://ipc.localhost; connect-src 'self' ipc: http://ipc.localhost ws://127.0.0.1:3847 ws://localhost:3847 http://127.0.0.1:3847 http://localhost:3847; frame-src 'self' ipc: http://ipc.localhost; child-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost blob: data: http://127.0.0.1:3847 http://localhost:3847; media-src 'self' asset: http://asset.localhost blob: data: http://127.0.0.1:3847 http://localhost:3847; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "shortDescription": "Offline-first sports scoreboard",
+    "longDescription": "Operator control and LED scoreboard output for local events."
+  }
+}

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080b12" />
+    <title>SkorKita - Live Scoreboard</title>
+    <link rel="stylesheet" href="styles.css?v=29" />
+    <link rel="stylesheet" href="scoreboard.css?v=28" />
+    <link rel="stylesheet" href="desktop.css?v=1" />
+  </head>
+  <body class="display-page">
+    <main class="display-shell">
+      <section class="scoreboard display-board" data-background="midnight" data-style="modern">
+        <div class="custom-media-layer" id="customMediaLayer">
+          <img id="customBackgroundImage" alt="" hidden />
+          <video id="customBackgroundVideo" muted loop playsinline hidden></video>
+        </div>
+        <button
+          class="display-fullscreen-button"
+          id="displayFullscreen"
+          title="Fullscreen"
+          aria-label="Fullscreen"
+          style="top:auto;right:auto;bottom:84px;left:20px"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
+          </svg>
+        </button>
+        <header class="display-event-header">
+          <img id="eventLogoDisplay" alt="Logo event" hidden />
+          <span id="eventNameDisplay">PERTANDINGAN</span>
+        </header>
+        <div class="score-stage display-stage">
+          <article class="team-display home-team">
+            <div class="logo-frame" id="homeLogoFrame">
+              <img id="homeLogo" alt="Logo tim tuan rumah" hidden />
+              <span class="logo-placeholder">H</span>
+            </div>
+            <h2 id="homeNameDisplay">GARUDA FC</h2>
+            <div class="team-stat-strip">
+              <span id="homePrimaryStat"><i id="homePrimaryStatLabel">TO</i> <b id="homeTimeoutsDisplay">0</b></span>
+              <span id="homeSecondaryStat"><i id="homeSecondaryStatLabel">FOUL</i> <b id="homeTeamFoulsDisplay">0</b></span>
+            </div>
+          </article>
+
+          <div class="match-center">
+            <div class="match-clock">
+              <div class="timer" id="timerDisplay">00:00</div>
+              <div class="added-time-display" id="addedTimeDisplay" hidden>+00:00</div>
+            </div>
+            <div class="score-row">
+              <strong id="homeScoreDisplay">0</strong>
+              <span>:</span>
+              <strong id="awayScoreDisplay">0</strong>
+            </div>
+            <div class="score-period" id="periodLabel">BABAK 1</div>
+            <div class="rally-status" id="rallyStatus" hidden>DEUCE</div>
+          </div>
+
+          <article class="team-display away-team">
+            <div class="logo-frame" id="awayLogoFrame">
+              <img id="awayLogo" alt="Logo tim tamu" hidden />
+              <span class="logo-placeholder">A</span>
+            </div>
+            <h2 id="awayNameDisplay">RAJAWALI FC</h2>
+            <div class="team-stat-strip">
+              <span id="awayPrimaryStat"><i id="awayPrimaryStatLabel">TO</i> <b id="awayTimeoutsDisplay">0</b></span>
+              <span id="awaySecondaryStat"><i id="awaySecondaryStatLabel">FOUL</i> <b id="awayTeamFoulsDisplay">0</b></span>
+            </div>
+          </article>
+        </div>
+
+        <div class="set-strip" id="setStrip" hidden>
+          <span id="setStripLabel">SET</span>
+          <strong id="homeSetDisplay">0</strong>
+          <span class="set-divider">-</span>
+          <strong id="awaySetDisplay">0</strong>
+        </div>
+        <div class="penalty-strip" id="penaltyStrip" hidden>
+          <span>ADU PENALTI</span>
+          <strong id="homePenaltyScoreDisplay">0</strong>
+          <span>-</span>
+          <strong id="awayPenaltyScoreDisplay">0</strong>
+        </div>
+
+        <div class="review-overlay switch-overlay" id="reviewOverlay" data-status="">
+          <div class="review-pulse"><span></span></div>
+          <span class="review-kicker" id="reviewKicker">OFFICIAL REVIEW</span>
+          <strong id="reviewStatusText">CHECKING VAR</strong>
+          <p id="reviewResultText">Keputusan sedang diperiksa</p>
+          <div class="review-requester">
+            <div class="review-team-logo" id="reviewTeamLogoFrame">
+              <img id="reviewTeamLogo" alt="Logo tim pengaju review" hidden />
+              <span id="reviewTeamLogoPlaceholder">H</span>
+            </div>
+            <span id="reviewRequester">DIAJUKAN OLEH GARUDA FC</span>
+          </div>
+        </div>
+
+        <div class="substitution-overlay switch-overlay" id="substitutionOverlay">
+          <div class="substitution-card-display">
+            <span class="substitution-kicker">PERGANTIAN PEMAIN</span>
+            <strong id="substitutionTeamName">GARUDA FC</strong>
+            <div class="player-switch-columns">
+              <section class="switch-column out-column">
+                <header><span>↓</span> PEMAIN KELUAR</header>
+                <div id="playersOutList"></div>
+              </section>
+              <section class="switch-column in-column">
+                <header><span>↑</span> PEMAIN MASUK</header>
+                <div id="playersInList"></div>
+              </section>
+            </div>
+            <div class="event-progress"><span></span></div>
+          </div>
+        </div>
+
+        <div class="foul-overlay switch-overlay" id="foulOverlay" data-tone="warning">
+          <div class="foul-flash" aria-hidden="true"></div>
+          <div class="foul-event-symbol" id="foulEventSymbol">!</div>
+          <span class="foul-kicker" id="foulKicker">MATCH EVENT</span>
+          <strong id="foulEventText">KARTU KUNING</strong>
+          <div class="foul-team">
+            <div class="foul-team-logo" id="foulTeamLogoFrame">
+              <img id="foulTeamLogo" alt="Logo tim kejadian" hidden />
+              <span id="foulTeamLogoPlaceholder">H</span>
+            </div>
+            <span id="foulTeamName">GARUDA FC</span>
+          </div>
+          <div class="foul-progress"><span></span></div>
+        </div>
+
+        <div class="sponsor-overlay" id="sponsorOverlay">
+          <span class="sponsor-kicker" id="sponsorKickerDisplay">PRESENTED BY</span>
+          <img id="sponsorLogoDisplay" alt="Logo sponsor" hidden />
+          <strong id="sponsorNameDisplay">SPONSOR</strong>
+        </div>
+
+        <div class="camera-overlay" id="cameraOverlay" data-filter="none">
+          <video id="cameraOutputVideo" autoplay playsinline muted></video>
+          <img id="cameraOutputFrame" alt="" hidden />
+          <div class="camera-output-shade"></div>
+          <span class="camera-output-emoji" id="cameraOutputEmoji"></span>
+          <div class="camera-output-label">
+            <span>BREAK CAM</span>
+            <strong id="cameraOutputTitle">LIVE EVENT</strong>
+          </div>
+          <p id="cameraOutputPlaceholder">MENUNGGU SUMBER KAMERA</p>
+        </div>
+
+        <div class="running-text-bar" id="runningTextBar">
+          <div class="running-text-track">
+            <span id="runningTextDisplay"></span>
+            <span aria-hidden="true" id="runningTextDuplicate"></span>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="scoreboard.js?v=37"></script>
+    <script src="desktop-runtime.js?v=1"></script>
+  </body>
+</html>

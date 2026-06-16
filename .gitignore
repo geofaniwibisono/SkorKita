@@ -1,0 +1,6 @@
+.DS_Store
+dist/
+node_modules/
+src-tauri/target/
+src-tauri/gen/
+outputs/macos-preview/
