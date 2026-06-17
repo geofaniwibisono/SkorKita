@@ -580,10 +580,15 @@ fn open_viewer_window(app: AppHandle, fullscreen: bool) -> Result<(), String> {
         window.set_focus().map_err(|error| error.to_string())?;
         return Ok(());
     }
+    // NOTE: Do not append a query string ("?role=viewer") to WebviewUrl::App.
+    // On Windows/WebView2 the "?" gets percent-encoded into the asset path,
+    // producing a 404 and a blank white window. scoreboard.html already carries
+    // the `display-page` body class, so the runtime defaults to the viewer role
+    // without any query parameters.
     WebviewWindowBuilder::new(
         &app,
         "viewer",
-        WebviewUrl::App("scoreboard.html?role=viewer&desktop=1".into()),
+        WebviewUrl::App("scoreboard.html".into()),
     )
     .title("SkorKita v1 - Scoreboard Viewer")
     .inner_size(1280.0, 720.0)
