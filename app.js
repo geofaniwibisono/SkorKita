@@ -352,9 +352,12 @@ let foulTimerId = null;
 let scoreboardWindow = null;
 let visibleSubstitutionRows = 1;
 const controllerViews = new Set(["match", "ticker", "visual"]);
-let activeControllerView = controllerViews.has(window.sessionStorage.getItem("skorkita-controller-view"))
-  ? window.sessionStorage.getItem("skorkita-controller-view")
-  : "match";
+const requestedControllerTab = new URLSearchParams(window.location.search).get("tab");
+let activeControllerView = controllerViews.has(requestedControllerTab)
+  ? requestedControllerTab
+  : controllerViews.has(window.sessionStorage.getItem("skorkita-controller-view"))
+    ? window.sessionStorage.getItem("skorkita-controller-view")
+    : "match";
 let savedMatches = loadSavedMatches();
 let sponsorTimerId = null;
 let cameraPreviewStream = null;
